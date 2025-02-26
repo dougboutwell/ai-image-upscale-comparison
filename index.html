@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Comparison</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            user-select: none;
+        }
+        .container {
+            position: relative;
+            width: 1024px;
+            height: 1024px;
+            margin: auto;
+            overflow: hidden;
+            border: 2px solid #000;
+        }
+        .image-wrapper {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        .image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+        }
+        .slider {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 5px;
+            height: 100%;
+            background: red;
+            cursor: ew-resize;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .slider::before {
+            content: '';
+            width: 20px;
+            height: 20px;
+            background: red;
+            border-radius: 50%;
+        }
+        .image-overlay {
+            position: absolute;
+            width: 50%;
+            height: 100%;
+            overflow: hidden;
+        }
+        .image-overlay img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Image Comparison Tool</h1>
+    <label for="imageSelectA">Choose left image:</label>
+    <select id="imageSelectA"></select>
+    <label for="imageSelectB">Choose right image:</label>
+    <select id="imageSelectB"></select>
+    <div class="container">
+        <div class="image-wrapper">
+            <img id="imageB" alt="Image B">
+        </div>
+        <div class="image-overlay" id="overlay">
+            <img id="imageA" alt="Image A">
+        </div>
+        <div class="slider" id="slider"></div>
+    </div>
+    <script>
+        const images = [
+            'images/A-Original.jpg',
+            'images/A-ImageUpscaler.jpg',
+            'images/A-Clarifai.jpg',
+            'images/A-Supir.jpg',
+            'images/B-Original.jpg',
+            'images/B-ImageUpscaler.jpg',
+            'images/B-Clarifai.jpg',
+            'images/B-Supir.jpg',
+            'images/C-Original.jpg',
+            'images/C-ImageUpscaler.jpg',
+            'images/C-Clarifai.jpg',
+            'images/C-Supir.jpg'
+        ];
+
+        const imageSelectA = document.getElementById('imageSelectA');
+        const imageSelectB = document.getElementById('imageSelectB');
+        const imageA = document.getElementById('imageA');
+        const imageB = document.getElementById('imageB');
+        const slider = document.getElementById('slider');
+        const overlay = document.getElementById('overlay');
+        let isDragging = false;
+
+        function populateDropdown(selectElement) {
+            images.forEach(image => {
+                let option = document.createElement('option');
+                option.value = image;
+                option.textContent = image;
+                selectElement.appendChild(option);
+            });
+        }
+
+        populateDropdown(imageSelectA);
+        populateDropdown(imageSelectB);
+
+        imageSelectA.value = images[0];
+        imageSelectB.value = images[1];
+        imageA.src = images[0];
+        imageB.src = images[1];
+
+        imageSelectA.addEventListener('change', () => {
+            imageA.src = imageSelectA.value;
+        });
+
+        imageSelectB.addEventListener('change', () => {
+            imageB.src = imageSelectB.value;
+        });
+
+        slider.addEventListener('mousedown', () => {
+            isDragging = true;
+        });
+        
+        document.addEventListener('mousemove', (event) => {
+            if (!isDragging) return;
+            let rect = overlay.parentElement.getBoundingClientRect();
+            let x = event.clientX - rect.left;
+            if (x < 0) x = 0;
+            if (x > rect.width) x = rect.width;
+            overlay.style.width = x + 'px';
+            slider.style.left = x + 'px';
+        });
+        
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+    </script>
+</body>
+</html>
