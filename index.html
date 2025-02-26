@@ -103,27 +103,43 @@
 
         function populateDropdown(selectElement) {
             images.forEach(image => {
+                let filename = image.split('/').pop();
                 let option = document.createElement('option');
                 option.value = image;
-                option.textContent = image;
+                option.textContent = filename;
                 selectElement.appendChild(option);
             });
         }
 
+        function updateURL() {
+            const params = new URLSearchParams(window.location.search);
+            params.set('left', imageSelectA.value);
+            params.set('right', imageSelectB.value);
+            window.history.replaceState({}, '', '?' + params.toString());
+        }
+
+        function loadFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            const leftImage = params.get('left') || images[0];
+            const rightImage = params.get('right') || images[1];
+            imageSelectA.value = leftImage;
+            imageSelectB.value = rightImage;
+            imageA.src = leftImage;
+            imageB.src = rightImage;
+        }
+
         populateDropdown(imageSelectA);
         populateDropdown(imageSelectB);
-
-        imageSelectA.value = images[0];
-        imageSelectB.value = images[1];
-        imageA.src = images[0];
-        imageB.src = images[1];
+        loadFromURL();
 
         imageSelectA.addEventListener('change', () => {
             imageA.src = imageSelectA.value;
+            updateURL();
         });
 
         imageSelectB.addEventListener('change', () => {
             imageB.src = imageSelectB.value;
+            updateURL();
         });
 
         slider.addEventListener('mousedown', () => {
